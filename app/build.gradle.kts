@@ -43,7 +43,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    viewBinding{
+    viewBinding {
         enable = true
     }
 }
@@ -61,4 +61,6 @@ dependencies {
     val retrofitVersion = "2.9.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+
+    implementation("androidx.activity:activity-ktx:1.9.0")
 }

@@ -7,27 +7,20 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.ArrayAdapter
+import androidx.activity.viewModels
 import br.edu.ifsp.scl.sdm.currencyconverter.R
 import br.edu.ifsp.scl.sdm.currencyconverter.databinding.ActivityMainBinding
 import br.edu.ifsp.scl.sdm.currencyconverter.model.livedata.CurrencyConverterLiveData
 import br.edu.ifsp.scl.sdm.currencyconverter.service.ConvertService
 import br.edu.ifsp.scl.sdm.currencyconverter.service.CurrenciesService
+import br.edu.ifsp.scl.sdm.currencyconverter.ui.viewmodel.CurrencyConverterViewModel
 
 class MainActivity : AppCompatActivity() {
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    private val currencyServiceIntent by lazy {
-        Intent(this, CurrenciesService::class.java)
-    }
-    private var convertService: ConvertService? = null
-    private val convertServiceConnection = object: ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            convertService = (service as ConvertService.ConvertServiceBinder).getConvertService()
-        }
 
-        override fun onServiceDisconnected(name: ComponentName?) {}
-    }
+    private val ccvm: CurrencyConverterViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             convertBt.setOnClickListener {
-                convertService?.convert(fromQuote, toQuote, amountTiet.text.toString())
+                ccvm.convert(fromQuote, toQuote, amountTiet.text.toString())
             }
         }
 
@@ -79,23 +72,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        startService(currencyServiceIntent)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Intent(this@MainActivity, ConvertService::class.java).also { intent ->
-            bindService(intent, convertServiceConnection, BIND_AUTO_CREATE)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        unbindService(convertServiceConnection)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopService(currencyServiceIntent)
+        ccvm.getCurrencies()
     }
 }
